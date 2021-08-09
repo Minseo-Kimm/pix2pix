@@ -61,7 +61,7 @@ class Generator(nn.Module):
         return output
 
 class Discriminator(nn.Module):
-    def __init__(self, in_chs=3, out_chs=1):
+    def __init__(self, in_chs=6, out_chs=1):
         super(Discriminator, self).__init__()
 
         self.enc1 = CBR2d(in_chs=in_chs, out_chs=64, batchnorm=False, relu=0.2)

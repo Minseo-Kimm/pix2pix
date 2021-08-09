@@ -5,10 +5,12 @@ from torch import float32
 from model import *
 
 # Training parameters
+useSave = False
 version = 1
 lr = 1e-4
 batch_size = 4
 epochs = 15
+L1weight = 100
 direction = 0       # 0: left -> right로 학습, 1: right -> left로 학습
 
 # Directories
@@ -20,8 +22,16 @@ dir_data = 'E:\dataset\pix2pix\edges2shoes'
 dir_train = os.path.join(dir_data, 'train')
 dir_val = os.path.join(dir_data, 'val')
 
+ckpt_dir = 'C:/Users/msKim/Desktop/pix2pix/ckpt'
+log_dir = 'C:/Users/msKim/Desktop/pix2pix/log'
+result_dir = 'C:/Users/msKim/Desktop/pix2pix/result'
+result_dir_train = os.path.join(result_dir, 'train')
+result_dir_val = os.path.join(result_dir, 'val')
 
+# Helper Functions
 fn_tonumpy = lambda x: x.to('cpu').detach().numpy().transpose(0, 2, 3, 1)
+fn_denorm = lambda x, mean, std: (x * std) + mean
+fn_class = lambda x: 1.0 * (x > 0.5)
 
 # segmentation data를 output image의 크기에 맞게 crop
 def cropimg(seg, output):
@@ -32,30 +42,32 @@ def cropimg(seg, output):
     return segcrop
 
 # 네트워크 저장
-def save(ckpt_dir, net, optim, epoch, ver, loss):
+def save(ckpt_dir, netG, netD, optimG, optimD, epoch, ver):
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
     
-    torch.save({'net': net.state_dict(), 'optim': optim.state_dict(), 'loss': loss},
+    torch.save({'netG': netG.state_dict(), 'netD': netD.state_dict(),
+                'optimG': optimG.state_dict(), 'optimD': optimD.state_dict()},
                 "%s/ver%d_model_epoch%d.pth" % (ckpt_dir, ver, epoch))
 
 # 네트워크 불러오기
-def load(ckpt_dir, net, optim, pre_loss):
+def load(ckpt_dir, netG, netD, optimG, optimD):
     if not os.path.exists(ckpt_dir):
         epoch = 0
-        return net, optim, epoch, pre_loss
+        return netG, netD, optimG, optimD, epoch
     
     ckpt_lst = os.listdir(ckpt_dir)
     #ckpt_lst.sort(key = lambda f: int(''.join(filter(str.isdigit, f))))
 
     dict_model = torch.load('%s/%s' % (ckpt_dir, ckpt_lst[-1]))
     print("USED MODEL :  %s" % ckpt_lst[-1])
-    net.load_state_dict(dict_model['net'])
-    optim.load_state_dict(dict_model['optim'])
+    netG.load_state_dict(dict_model['netG'])
+    netD.load_state_dict(dict_model['netD'])
+    optimG.load_state_dict(dict_model['optimG'])
+    optimD.load_state_dict(dict_model['optimD'])
     epoch = int(ckpt_lst[-1].split('epoch')[1].split('.pth')[0])
-    pre_loss = dict_model['loss']
 
-    return net, optim, epoch, pre_loss
+    return netG, netD, optimG, optimD, epoch
 
 # output pixels의 값을 0또는 1으로 변환
 def makePredict(output):

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from torchvision import transforms, datasets
 from glob import glob
-from skimage.transform import rescale, resize
+from skimage.transform import resize
 
 class pix2pix_Dataset(torch.utils.data.Dataset):
     def __init__(self, data_dir, transform=None, direction=0):
