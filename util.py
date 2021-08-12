@@ -18,7 +18,7 @@ def makeDir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-dir_data = 'E:\dataset\pix2pix\edges2shoes'
+dir_data = 'E:\pix2pix\edges2shoes'
 dir_train = os.path.join(dir_data, 'train')
 dir_val = os.path.join(dir_data, 'val')
 

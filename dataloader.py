@@ -102,8 +102,8 @@ class Resize(object):
     
     def __call__(self, data):
         label, input = data['label'], data['input']
-        label = resize(label, output_shape=(self.shape[0], self.shape[1], self.shape[2]))
-        input = resize(input, output_shape=(self.shape[0], self.shape[1], self.shape[2]))
+        label = resize(label, (self.shape[0], self.shape[1], self.shape[2]))
+        input = resize(input, (self.shape[0], self.shape[1], self.shape[2]))
 
         data = {'label': label, 'input': input}
         return data
