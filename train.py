@@ -17,18 +17,22 @@ torch.manual_seed(300)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Create Dataset & Network
+"""
 transform_train = transforms.Compose([Resize(shape=(286, 286, 1)), 
                                       RandomCrop((256, 256)),
-                                      Normalization(mean=0.5, std=0.5)])
-dataset_train = pix2pix_Dataset(dir_train, transform=transform_train, direction=direction)
+                                      Normalization(mean=0.5, std=0.5), ToTensor()])"""
+transform_train_imsi = transforms.Compose([Normalization(mean=0.5, std=0.5), ToTensor()])
+dataset_train = pix2pix_Dataset(dir_train, transform=transform_train_imsi, direction=direction)
 loader_train = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, drop_last=True)
 num_data_train = len(dataset_train)
 num_batch_train = np.ceil(num_data_train / batch_size)
 
+"""
 transform_val = transforms.Compose([Resize(shape=(286, 286, 1)), 
                                       RandomCrop((256, 256)),
-                                      Normalization(mean=0.5, std=0.5)])
-dataset_val = pix2pix_Dataset(dir_val, transform=transform_val, direction=direction)
+                                      Normalization(mean=0.5, std=0.5), ToTensor()])"""
+transform_val_imsi = transforms.Compose([Normalization(mean=0.5, std=0.5), ToTensor()])
+dataset_val = pix2pix_Dataset(dir_val, transform=transform_val_imsi, direction=direction)
 loader_val = DataLoader(dataset_val, batch_size=batch_size, shuffle=False, drop_last=True)
 num_data_val = len(dataset_val)
 num_batch_val = np.ceil(num_data_val / batch_size)
@@ -117,9 +121,11 @@ for epoch in range(st_epoch, epochs):
             output = np.clip(output, a_min=0, a_max=1)
 
             batchnum = num_batch_train * epoch + batch
-            plt.imsave(os.path.join(result_dir_train, 'png', '%04d_input.png' % batchnum), input[0])
-            plt.imsave(os.path.join(result_dir_train, 'png', '%04d_label.png' % batchnum), label[0])
-            plt.imsave(os.path.join(result_dir_train, 'png', '%04d_output.png' % batchnum), output[0])
+            res_path = os.path.join(result_dir_train, 'ver_%03d' % version)
+            makeDir(res_path)
+            plt.imsave(os.path.join(res_path, '%04d_input.png' % batchnum), input[0])
+            plt.imsave(os.path.join(res_path, '%04d_label.png' % batchnum), label[0])
+            plt.imsave(os.path.join(res_path, '%04d_output.png' % batchnum), output[0])
 
             writer_train.add_image('input', input, batchnum, dataformats='NHWC')
             writer_train.add_image('label', label, batchnum, dataformats='NHWC')
@@ -189,9 +195,11 @@ for epoch in range(st_epoch, epochs):
                 output = np.clip(output, a_min=0, a_max=1)
 
                 batchnum = num_batch_val * epoch + batch
-                plt.imsave(os.path.join(result_dir_val, 'png', '%04d_input.png' % batchnum), input[0])
-                plt.imsave(os.path.join(result_dir_val, 'png', '%04d_label.png' % batchnum), label[0])
-                plt.imsave(os.path.join(result_dir_val, 'png', '%04d_output.png' % batchnum), output[0])
+                res_path = os.path.join(result_dir_val, 'ver_%03d' % version)
+                makeDir(res_path)
+                plt.imsave(os.path.join(res_path, '%04d_input.png' % batchnum), input[0])
+                plt.imsave(os.path.join(res_path, '%04d_label.png' % batchnum), label[0])
+                plt.imsave(os.path.join(res_path, '%04d_output.png' % batchnum), output[0])
 
                 writer_train.add_image('input', input, batchnum, dataformats='NHWC')
                 writer_train.add_image('label', label, batchnum, dataformats='NHWC')

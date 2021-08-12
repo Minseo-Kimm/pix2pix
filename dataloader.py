@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from torchvision import transforms, datasets
 from glob import glob
-from skimage.transform import resize
+#from skimage.transform import resize
 
 class pix2pix_Dataset(torch.utils.data.Dataset):
     def __init__(self, data_dir, transform=None, direction=0):
@@ -95,7 +95,8 @@ class RandomCrop(object):
         input = input[rh, rw]
         data = {'label': label, 'input': input}
         return data
-        
+
+"""
 class Resize(object):
     def __init__(self, shape):
         self.shape = shape
@@ -107,3 +108,4 @@ class Resize(object):
 
         data = {'label': label, 'input': input}
         return data
+        """

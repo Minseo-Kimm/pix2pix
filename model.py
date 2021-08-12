@@ -25,7 +25,7 @@ class Generator(nn.Module):
         self.dec2 = CBR2d(in_chs=256, out_chs=64, path='dec')
 
         layers = []
-        layers += [nn.Conv2d(in_channels=128, out_channels=out_chs,
+        layers += [nn.ConvTranspose2d(in_channels=128, out_channels=out_chs,
                                 kernel_size=4, stride=2, padding=1, bias=True)]
         layers += [nn.Sigmoid()]
         self.final = nn.Sequential(*layers)
@@ -57,7 +57,6 @@ class Generator(nn.Module):
         dec2 = torch.cat((dec2, enc1), dim=1)
 
         output = self.final(dec2)
-
         return output
 
 class Discriminator(nn.Module):

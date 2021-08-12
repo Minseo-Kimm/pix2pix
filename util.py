@@ -10,7 +10,7 @@ version = 1
 lr = 1e-4
 batch_size = 4
 epochs = 15
-L1weight = 100
+L1weight = 10
 direction = 0       # 0: left -> right로 학습, 1: right -> left로 학습
 
 # Directories
@@ -24,7 +24,7 @@ dir_val = os.path.join(dir_data, 'val')
 
 ckpt_dir = 'C:/Users/msKim/Desktop/pix2pix/ckpt'
 log_dir = 'C:/Users/msKim/Desktop/pix2pix/log'
-result_dir = 'C:/Users/msKim/Desktop/pix2pix/result'
+result_dir = 'C:\\Users\\msKim\\Desktop\\pix2pix\\result'
 result_dir_train = os.path.join(result_dir, 'train')
 result_dir_val = os.path.join(result_dir, 'val')
 
