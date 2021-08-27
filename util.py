@@ -4,14 +4,21 @@ import torch.nn as nn
 from torch import float32
 from model import *
 
+"""
+# 1: lr = 1e-4, L1weight = 10
+# 2: lr = 1e-3, L1weight = 100
+# 3: lr = 2e-4, ver2 epoch5의 G만을 불러와 학습 시작
+# 4: L1weight = 30
+"""
+
 # Training parameters
 useSave = False
-version = 1
-lr = 1e-4
+version = 4
+lr = 2e-4
 batch_size = 4
-epochs = 15
-L1weight = 10
-direction = 0       # 0: left -> right로 학습, 1: right -> left로 학습
+epochs = 20
+L1weight = 30
+direction = 1       # 0: left -> right로 학습, 1: right -> left로 학습
 
 # Directories
 def makeDir(dir):
@@ -23,6 +30,7 @@ dir_train = os.path.join(dir_data, 'train')
 dir_val = os.path.join(dir_data, 'val')
 
 ckpt_dir = 'C:/Users/msKim/Desktop/pix2pix/ckpt'
+ckpt_use_dir = 'C:/Users/msKim/Desktop/pix2pix/ckptuse'
 log_dir = 'C:/Users/msKim/Desktop/pix2pix/log'
 result_dir = 'C:\\Users\\msKim\\Desktop\\pix2pix\\result'
 result_dir_train = os.path.join(result_dir, 'train')
@@ -50,8 +58,12 @@ def save(ckpt_dir, netG, netD, optimG, optimD, epoch, ver):
                 'optimG': optimG.state_dict(), 'optimD': optimD.state_dict()},
                 "%s/ver%d_model_epoch%d.pth" % (ckpt_dir, ver, epoch))
 
+def saveG(ckpt_dir, netG, optimG, epoch, ver):
+    torch.save({'netG': netG.state_dict(), 'optimG': optimG.state_dict()},
+                "%s/ver%d_modelG_epoch%d.pth" % (ckpt_dir, ver, epoch))
+
 # 네트워크 불러오기
-def load(ckpt_dir, netG, netD, optimG, optimD):
+def load(ckpt_dir, netG, netD, optimG, optimD, onlyG=False):
     if not os.path.exists(ckpt_dir):
         epoch = 0
         return netG, netD, optimG, optimD, epoch
@@ -62,9 +74,10 @@ def load(ckpt_dir, netG, netD, optimG, optimD):
     dict_model = torch.load('%s/%s' % (ckpt_dir, ckpt_lst[-1]))
     print("USED MODEL :  %s" % ckpt_lst[-1])
     netG.load_state_dict(dict_model['netG'])
-    netD.load_state_dict(dict_model['netD'])
     optimG.load_state_dict(dict_model['optimG'])
-    optimD.load_state_dict(dict_model['optimD'])
+    if not (onlyG):
+        netD.load_state_dict(dict_model['netD'])
+        optimD.load_state_dict(dict_model['optimD'])
     epoch = int(ckpt_lst[-1].split('epoch')[1].split('.pth')[0])
 
     return netG, netD, optimG, optimD, epoch

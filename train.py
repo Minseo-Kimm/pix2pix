@@ -52,8 +52,8 @@ optim_D = torch.optim.Adam(D.parameters(), lr=lr, betas=(0.5, 0.999))
 # 학습 전 저장된 네트워크가 있다면 불러오기
 st_epoch = 0
 if (useSave):
-    G, D, optim_G, optim_D, st_epoch = load(ckpt_dir=ckpt_dir,
-                                            netG=G, netD=D, optimG=optim_G, optimD=optim_D)
+    G, D, optim_G, optim_D, st_epoch = load(ckpt_dir=ckpt_use_dir,
+                                            netG=G, netD=D, optimG=optim_G, optimD=optim_D, onlyG=True)
 
 # Training
 print("TRAINING STARTS")
@@ -111,7 +111,7 @@ for epoch in range(st_epoch, epochs):
                    np.mean(loss_G_L1_train), np.mean(loss_G_GAN_train),
                    np.mean(loss_D_real_train), np.mean(loss_D_fake_train)))
         
-        if (batch % 20 == 0) :
+        if (batch % 200 == 0) :
             input = fn_tonumpy(fn_denorm(input, mean=0.5, std=0.5)).squeeze()
             label = fn_tonumpy(fn_denorm(label, mean=0.5, std=0.5)).squeeze()
             output = fn_tonumpy(fn_denorm(output, mean=0.5, std=0.5)).squeeze()
@@ -185,7 +185,7 @@ for epoch in range(st_epoch, epochs):
                     np.mean(loss_G_L1_val), np.mean(loss_G_GAN_val),
                     np.mean(loss_D_real_val), np.mean(loss_D_fake_val)))
             
-            if (batch % 10 == 0) :
+            if (batch % 5 == 0) :
                 input = fn_tonumpy(fn_denorm(input, mean=0.5, std=0.5)).squeeze()
                 label = fn_tonumpy(fn_denorm(label, mean=0.5, std=0.5)).squeeze()
                 output = fn_tonumpy(fn_denorm(output, mean=0.5, std=0.5)).squeeze()
@@ -211,7 +211,7 @@ for epoch in range(st_epoch, epochs):
         writer_val.add_scalar('loss_D_real', np.mean(loss_D_real_val), epoch+1)
         writer_val.add_scalar('loss_D_fake', np.mean(loss_D_fake_val), epoch+1)
 
-    if (epoch % 3 or epoch == epochs - 1):
+    if (True):
         save(ckpt_dir=ckpt_dir, netG=G, netD=D, optimG=optim_G, optimD=optim_D, epoch=epoch, ver=version)
     
 writer_train.close()
